@@ -516,7 +516,7 @@ void BLEconnect() {
   BLEDevice::init("");
   for (vector<BLEdevice>::iterator p = devices.begin(); p != devices.end(); ++p) {
     if (p->sensorModel == LYWSD03MMC) {
-      Log.trace(F("Model to connect found: %s: %s" CR), p->sensorModel, p->macAdr);
+      Log.trace(F("Model to connect found" CR));
       NimBLEClient* pClient;
       pClient = BLEDevice::createClient();
       BLEUUID serviceUUID("ebe0ccb0-7a0a-4b0c-8a1a-6ff2997da3a6");
@@ -530,19 +530,23 @@ void BLEconnect() {
         if (!pRemoteService) {
           Log.warning(F("Failed to find service UUID: %s" CR), serviceUUID.toString().c_str());
           pClient->disconnect();
-          return;
         } else {
           Log.trace(F("Found service: %s" CR), serviceUUID.toString().c_str());
           // Obtain a reference to the characteristic in the service of the remote BLE server.
           if (pClient->isConnected()) {
             Log.trace(F("Client isConnected, freeHeap: %d" CR), ESP.getFreeHeap());
             BLERemoteCharacteristic* pRemoteCharacteristic = pRemoteService->getCharacteristic(charUUID);
-            if (pRemoteCharacteristic->canNotify()) {
-              Log.trace(F("Registering callback" CR));
-              pRemoteCharacteristic->subscribe(true, notifyCB);
-            } else {
+            if (!pRemoteCharacteristic) {
               Log.warning(F("Failed to find characteristic UUID: %s" CR), charUUID.toString().c_str());
               pClient->disconnect();
+            } else {
+              if (pRemoteCharacteristic->canNotify()) {
+                Log.trace(F("Registering notification" CR));
+                pRemoteCharacteristic->subscribe(true, notifyCB);
+              } else {
+                Log.warning(F("Failed registering notification" CR));
+                pClient->disconnect();
+              }
             }
           }
         }
@@ -592,7 +596,7 @@ void coreTask(void* pvParameters) {
         delay(BLEinterval);
       }
     } else {
-          Log.trace(F("BLE core task canceled by processLock" CR));
+      Log.trace(F("BLE core task canceled by processLock" CR));
     }
   }
 }
