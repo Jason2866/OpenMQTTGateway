@@ -39,6 +39,10 @@ extern void MQTTtoBT(char* topicOri, JsonObject& RFdata);
 //#define HM-11 // uncomment this line if you use HM-11 and comment the line above
 //#define HM_BLUE_LED_STOP true //uncomment to stop the blue led light of HM1X
 #define BLEdelimiter         "4f4b2b444953413a" // OK+DISA:
+#define BLEEndOfDiscovery    "4f4b2b4449534345" // OK+DISCE
+#define BLEdelimiterLength   16
+#define CRLR                 "0d0a"
+#define CRLR_Length          4
 #define ServicedataMinLength 29
 
 #ifndef TimeBtw_Read
@@ -66,6 +70,24 @@ unsigned int BLEinterval = TimeBtw_Read; //time between 2 scans
 /*-------------------HOME ASSISTANT ROOM PRESENCE ----------------------*/
 // if not commented Home presence integration with HOME ASSISTANT is activated
 #define subjectHomePresence "home_presence/" // will send Home Assistant room presence message to this topic (first part is same for all rooms, second is room name)
+
+enum ble_sensor_model {
+  UNKNOWN_MODEL = -1,
+  BEGINING = 0,
+  HHCCJCY01HHCC,
+  VEGTRUG,
+  LYWSDCGQ,
+  JQJCY01YM,
+  LYWSD02, //5
+  CGG1,
+  CGP1W,
+  MUE4094RT,
+  CGD1,
+  MIBAND, //10
+  XMTZC04HM,
+  XMTZC05HM,
+  INKBIRD,
+};
 
 /*-------------------PIN DEFINITIONS----------------------*/
 #if !defined(BT_RX) || !defined(BT_TX)
